@@ -3,12 +3,18 @@
 import argparse
 import sys
 
-error_message_incorrect_arguments   = "Incorrect arguments. -h for help."
-error_message_not_natural_number    = "Oops, that is not a natural number."
+message_error_incorrect_arguments   = "Incorrect arguments. -h for help."
+message_error_not_natural_number    = "Oops, that is not a natural number."
+message_input                       = "Enter a natural number (or enter 0 to quit): "
+message_goodbye                     = "Goodbye."
 
 def sum(n):
     '''Returns the sum of all numbers [1-n]'''
     return int(n * (n + 1) / 2)
+
+def print_sum(n):
+    '''Prints a sum message'''
+    print("The sum of the numbers from 1 to", n, "is:", sum(n))
 
 def is_natural_number(number):
     '''Returns whether a number is natural'''
@@ -18,23 +24,24 @@ def is_natural_number(number):
         return False
 
 def user_input():
-    '''Asks the user for a natural number'''
+    '''Asks the user for natural numbers and prints them'''
     natural_number_given = False
     
     while (natural_number_given == False):
         try:
-            input_number = int(input("Enter a natural number: "))
-            if (is_natural_number(input_number)):
-                natural_number_given = True
+            input_number = int(input(message_input))
+            if (input_number == 0):
+                sys.exit(message_goodbye)
+            elif (not(is_natural_number(input_number))):
+                print(message_error_not_natural_number)
             else:
-                print(error_message_not_natural_number)
+                print_sum(input_number)
         except ValueError:
-            print(error_message_not_natural_number)
-            
-    return input_number
+            print(message_error_not_natural_number)
     
 def main(argv):
-    '''Prints the sum of all numbers [1-n], where n is either a given argument or live input'''
+    '''If a number n is given as argument, prints the sum of all numbers [1-n].
+    If no argument is given, user input is asked.'''
     
     # Create a command line argument parser.
     parser = argparse.ArgumentParser(prog="triangular", description="Prints the sum of all numbers [1-n]")
@@ -44,17 +51,17 @@ def main(argv):
     # If the number list exists, put it in integer n and check whether it is a natural number.
     if (vars(parser.parse_args())["number_list"]):
         try:
-            n = int((vars(parser.parse_args())["number_list"]).pop())
+            arg_number = int((vars(parser.parse_args())["number_list"]).pop())
         except:
-            sys.exit(error_message_incorrect_arguments)
-        if (not is_natural_number(n)):
-            sys.exit(error_message_not_natural_number)
+            sys.exit(message_error_incorrect_arguments)
+        if (not is_natural_number(arg_number)):
+            sys.exit(message_error_not_natural_number)
+        # Print the result.
+        print_sum(arg_number)  
+            
     # Otherwise, ask for user input.
     else:
-        n = user_input()
-    
-    # Print the result.
-    print("The sum of the numbers from 1 to", n, "is:", sum(n))
+        user_input()
         
 if __name__ == "__main__":
     main(sys.argv[1:])
